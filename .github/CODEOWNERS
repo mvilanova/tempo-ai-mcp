@@ -1,0 +1,9 @@
+# CODEOWNERS file
+# This file defines code owners for this repository.
+# Each line is a file pattern followed by one or more owners.
+# Owners are identified by GitHub usernames or team names (e.g., @username or @org/team-name)
+#
+# More information: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Owner for all files in the repository
+* @mvilanova
