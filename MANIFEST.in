@@ -1,0 +1,4 @@
+include README.md
+include .env.example
+include server.py
+include utils/*.py

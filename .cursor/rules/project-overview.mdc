@@ -1,0 +1,49 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Tempo AI MCP Server Project Overview
+
+Model Context Protocol (MCP) server for connecting Claude and ChatGPT with the Tempo AI API. It provides tools for authentication and data retrieval for workouts, events, and wellness data.
+
+## Project Structure
+
+- **Main Entry Point**: [src/tempoai_mcp_server/server.py](mdc:src/tempoai_mcp_server/server.py) - Contains the FastMCP server implementation with all MCP tools
+- **API Client**: [src/tempoai_mcp_server/api/client.py](mdc:src/tempoai_mcp_server/api/client.py) - HTTP client for Tempo AI API communication
+- **Configuration**: [pyproject.toml](mdc:pyproject.toml) - Project configuration, dependencies, and build settings
+- **Environment Setup**: [.env.example](mdc:.env.example) - Template for environment variables (API_KEY)
+- **Documentation**: [README.md](mdc:README.md) - Comprehensive setup and usage guide
+- **Developer Guide**: [CONTRIBUTING.md](mdc:CONTRIBUTING.md) - Contributor and development instructions
+
+## Core Components
+
+### MCP Tools
+- `get_workouts` - Retrieve athlete workouts with filtering and pagination
+- `get_workout_details` - Get detailed information for specific workouts
+- `get_events` - Retrieve upcoming events (workouts, races, etc.)
+- `get_event_details` - Get detailed information for specific events
+- `get_wellness` - Fetch wellness metrics and data
+
+### Utilities
+- **Formatting**: [src/tempoai_mcp_server/utils/formatting.py](mdc:src/tempoai_mcp_server/utils/formatting.py) - Data formatting utilities for MCP responses
+- **Validation**: [src/tempoai_mcp_server/utils/validation.py](mdc:src/tempoai_mcp_server/utils/validation.py) - Input validation utilities
+- **Dates**: [src/tempoai_mcp_server/utils/dates.py](mdc:src/tempoai_mcp_server/utils/dates.py) - Date parsing and formatting utilities
+
+### Testing
+- **Tests Directory**: [tests/](mdc:tests) - Unit tests for server functionality and utilities
+- **Sample Data**: [tests/sample_data.py](mdc:tests/sample_data.py) - Test data for development
+
+## Key Technologies
+- **Python 3.13+** - Required runtime version
+- **FastMCP** - MCP server framework
+- **httpx** - Async HTTP client for API calls
+- **uv** - Package manager and virtual environment tool
+- **pytest** - Testing framework
+- **ruff** - Linting and code formatting
+- **mypy** - Static type checking
+
+## Environment Variables
+- `API_KEY` - Tempo AI API key (required)
+- `TEMPO_AI_API_BASE_URL` - API base URL (optional, defaults to https://api.jointempo.ai/v1)
+- `LOG_LEVEL` - Logging level (optional, defaults to INFO)

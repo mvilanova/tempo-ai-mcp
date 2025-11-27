@@ -1,0 +1,113 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tempoai-mcp-server"
+version = "1.0.0"
+description = "A Model Context Protocol server for Tempo AI"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.13"
+license = { text = "GPL-3.0-only" }
+authors = [{ name = "Marc Vilanova", email = "barker-riddle.8z@icloud.com" }]
+dependencies = ["mcp[cli]>=1.4.0", "httpx>=0.25.0", "python-dotenv>=1.0.0"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+]
+keywords = ["tempoai", "cycling", "running", "mcp", "ai"]
+
+[project.urls]
+"Homepage" = "https://github.com/mvilanova/tempoai-mcp-server"
+"Bug Tracker" = "https://github.com/mvilanova/tempoai-mcp-server/issues"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3.5", "mypy>=1.0.0", "ruff>=0.1.0", "pytest-asyncio>=0.21", "pre-commit", "hatch", "pytest-mock==3.12.0"]
+
+[tool.hatch.build]
+include = ["server.py", "utils/*.py", "README.md", ".env.example"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tempoai_mcp_server"]
+
+[tool.hatch.envs.default.scripts]
+test = "pytest -q"
+
+
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+# Select specific errors and warnings
+select = [
+    "E", # pycodestyle errors
+    "W", # pycodestyle warnings
+    "F", # pyflakes
+    # "I",  # isort
+    "C", # flake8-comprehensions
+    "B", # flake8-bugbear
+]
+
+# Ignore specific errors and warnings
+ignore = [
+    "E501", # line too long, handled by black
+    "B008", # do not perform function calls in argument defaults
+    "C901", # complexity
+    "G004", # Ignore f-string in logging
+]
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["A", "B", "C", "D", "E", "F"]
+
+# No unfixable rules.
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+isort.known-third-party = ["starlette"]
+
+# Unlike Flake8, default to a complexity level of 10.
+mccabe.max-complexity = 10
+
+[tool.typos]
+default.check-filename = true
+default.check-file = true
+default.unicode = true
+default.locale = "en-us"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+python_files = "test_*.py"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.uv]
+index-url = "https://pypi.org/simple"

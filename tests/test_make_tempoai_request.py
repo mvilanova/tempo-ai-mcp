@@ -1,0 +1,80 @@
+"""
+Unit tests for the make_tempo_ai_request function in tempoai_mcp_server.api.client.
+
+These tests focus on error handling, particularly the scenario where the API returns invalid JSON.
+Mock classes are used to simulate httpx responses and client behavior.
+"""
+
+import asyncio
+import logging
+import os
+import pathlib
+import sys
+from json import JSONDecodeError
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
+os.environ.setdefault("API_KEY", "test")
+
+from tempoai_mcp_server.api import client
+
+
+class MockBadJSONResponse:
+    """
+    Simulates an httpx response object that returns invalid JSON content.
+    Used to test error handling for JSONDecodeError in make_tempo_ai_request.
+    """
+
+    def __init__(self):
+        self.content = b"bad"
+        self.status_code = 200
+
+    def raise_for_status(self):
+        """Mock raise_for_status that does nothing."""
+        return None
+
+    def json(self):
+        """Raise JSONDecodeError to simulate invalid JSON."""
+        raise JSONDecodeError("Expecting value", "bad", 0)
+
+
+class MockAsyncClient:
+    """
+    Simulates an httpx.AsyncClient for use in monkeypatching.
+    Always returns a MockBadJSONResponse from get().
+    """
+
+    def __init__(self, *_args, **_kwargs):
+        # Accept any arguments to match httpx.AsyncClient's interface
+        self.is_closed = False
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        pass
+
+    async def get(self, url=None, **_kwargs):
+        """Mock get method that returns MockBadJSONResponse."""
+        return MockBadJSONResponse()
+
+    async def request(self, *_args, **_kwargs):
+        """Mock request method that returns MockBadJSONResponse."""
+        return MockBadJSONResponse()
+
+    async def aclose(self):
+        """Simulate closing the AsyncClient."""
+        self.is_closed = True
+
+
+def test_make_tempo_ai_request_bad_json(monkeypatch, caplog):
+    """
+    Test that make_tempo_ai_request returns an error dict when the response contains invalid JSON.
+    Ensures proper logging and error message content.
+    """
+    monkeypatch.setattr(client, "httpx_client", MockAsyncClient())
+
+    with caplog.at_level(logging.ERROR):
+        result = asyncio.run(client.make_tempo_ai_request("/bad", api_key="test-key"))
+
+    assert result["error"] is True
+    assert "Invalid JSON in response" in result["message"]
