@@ -22,16 +22,24 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.13"
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+      with:
+        version: "latest"
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Install project in editable mode
+        uv sync --all-extras
+    - name: Check lock file
       run: |
-        pip install -e .
+        uv lock --check
+    - name: Lint with ruff
+      run: |
+        uv run ruff check .
+    - name: Type check with mypy
+      run: |
+        uv run mypy src tests
     - name: Test with pytest
       env:
         API_KEY: ${{ secrets.API_KEY }}
       run: |
-        pytest
+        uv run --locked pytest
