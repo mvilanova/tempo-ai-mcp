@@ -59,14 +59,14 @@ def run_mcp_install(server_path: Path, package_dir: Path, env_file: Path) -> Non
     ]
 
     try:
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, capture_output=True)
     except FileNotFoundError as err:
         raise click.ClickException(
             "The 'mcp' command was not found. "
             "Please ensure mcp[cli] is installed: pip install 'mcp[cli]'"
         ) from err
-    except subprocess.CalledProcessError as err:
-        raise click.ClickException(f"Failed to configure Claude Desktop: {err}") from err
+    except subprocess.CalledProcessError:
+        raise click.ClickException("Failed to configure Claude Desktop. Please check your configuration and try again.")
 
 
 @click.group()
