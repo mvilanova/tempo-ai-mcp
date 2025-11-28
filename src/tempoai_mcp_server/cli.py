@@ -142,7 +142,7 @@ def install(api_key: str | None) -> None:
 
     # Success message
     click.echo()
-    click.secho("╔══════════════════════════════════════════════════════════════╗", fg="green")
+    click.secho("║                  Installation Complete!                      ║", fg="green")
     click.secho("║                  Installation Complete!                       ║", fg="green")
     click.secho("╚══════════════════════════════════════════════════════════════╝", fg="green")
     click.echo()
