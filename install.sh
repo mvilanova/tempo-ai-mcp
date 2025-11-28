@@ -99,7 +99,14 @@ echo -e "${GREEN}✓ Environment configured${NC}"
 
 # Configure Claude Desktop
 echo -e "${YELLOW}🔧 Configuring Claude Desktop...${NC}"
-mcp install src/tempoai_mcp_server/server.py --name "TempoAI" --with-editable . --env-file .env
+if ! command -v mcp >/dev/null 2>&1; then
+    echo -e "${RED}Error: 'mcp' command not found. Please ensure MCP is installed and available in your PATH.${NC}"
+    exit 1
+fi
+if ! mcp install src/tempoai_mcp_server/server.py --name "TempoAI" --with-editable . --env-file .env; then
+    echo -e "${RED}Error: Failed to configure Claude Desktop with MCP. Please check the output above for details.${NC}"
+    exit 1
+fi
 echo -e "${GREEN}✓ Claude Desktop configured${NC}"
 
 # Success message
