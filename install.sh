@@ -56,7 +56,6 @@ fi
 if [ -d "$INSTALL_DIR" ]; then
     echo -e "${YELLOW}📥 Updating existing installation...${NC}"
     cd "$INSTALL_DIR"
-    git fetch origin main
     git pull origin main
     echo -e "${GREEN}✓ Repository updated${NC}"
 else
