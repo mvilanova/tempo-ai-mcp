@@ -97,9 +97,9 @@ def install(api_key: str | None) -> None:
     the Tempo AI tools.
     """
     click.echo()
-    click.secho("+------------------------------------------------------------+", fg="green")
-    click.secho("|           Tempo AI MCP Server Setup                        |", fg="green")
-    click.secho("+------------------------------------------------------------+", fg="green")
+    click.secho("╔══════════════════════════════════════════════════════════════╗", fg="green")
+    click.secho("║              Tempo AI MCP Server Setup                       ║", fg="green")
+    click.secho("╚══════════════════════════════════════════════════════════════╝", fg="green")
     click.echo()
 
     # Prompt for API key if not provided
@@ -142,6 +142,7 @@ def install(api_key: str | None) -> None:
 
     # Success message
     click.echo()
+    click.secho("╔══════════════════════════════════════════════════════════════╗", fg="green")
     click.secho("║                  Installation Complete!                      ║", fg="green")
     click.secho("╚══════════════════════════════════════════════════════════════╝", fg="green")
     click.echo()
