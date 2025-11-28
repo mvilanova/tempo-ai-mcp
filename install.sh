@@ -84,7 +84,8 @@ echo "  1. Log in at https://jointempo.ai/signin"
 echo "  2. Go to Settings > Developer"
 echo "  3. Generate a new API key"
 echo ""
-read -p "Enter your Tempo AI API key: " API_KEY
+read -s -p "Enter your Tempo AI API key: " API_KEY
+echo
 
 if [ -z "$API_KEY" ]; then
     echo -e "${RED}Error: API key is required.${NC}"
