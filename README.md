@@ -4,6 +4,41 @@ Model Context Protocol (MCP) server for connecting Claude and ChatGPT with the T
 
 Tempo AI allows you to train hard without burning out. Join the beta at https://jointempo.ai/.
 
+## Quick Install
+
+Get up and running with a single command:
+
+### Option 1: One-line installer (recommended)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mvilanova/tempoai-mcp-server/main/install.sh | bash
+```
+
+This will install everything automatically and configure Claude Desktop. You'll be prompted for your API key.
+
+### Option 2: Using uvx (no installation required)
+
+If you have [uv](https://github.com/astral-sh/uv) installed:
+
+```bash
+uvx tempoai-mcp-server install
+```
+
+### Option 3: Using pipx
+
+```bash
+pipx install tempoai-mcp-server
+tempoai-mcp-server install
+```
+
+After installation, restart Claude Desktop and start chatting about your workouts!
+
+---
+
+## Manual Setup
+
+If you prefer manual installation, follow the steps below.
+
 ## Requirements
 
 - Python 3.13 or higher
