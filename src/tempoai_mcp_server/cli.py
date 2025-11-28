@@ -73,7 +73,7 @@ def run_mcp_install(server_path: Path, package_dir: Path, env_file: Path) -> Non
 @click.version_option(package_name="tempoai-mcp-server")
 def cli() -> None:
     """Tempo AI MCP Server - Connect Claude with your Tempo AI data."""
-    pass
+    ...
 
 
 @cli.command()
