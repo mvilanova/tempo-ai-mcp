@@ -134,26 +134,15 @@ echo -e "${GREEN}✓ Server module verified${NC}"
 
 # Configure Claude Desktop
 echo -e "${YELLOW}🔧 Configuring Claude Desktop...${NC}"
-
-# Check if Claude Desktop config directory exists
-CLAUDE_CONFIG_DIR="${HOME}/Library/Application Support/Claude"
-if [[ "$OSTYPE" == "darwin"* ]] && [ ! -d "$CLAUDE_CONFIG_DIR" ]; then
-    echo -e "${YELLOW}⚠️  Claude Desktop config directory not found.${NC}"
-    echo "  If Claude Desktop is installed, please launch it once first."
-    echo "  You can also configure manually later using:"
-    echo -e "  ${BLUE}cd ${INSTALL_DIR} && source .venv/bin/activate && mcp install src/tempoai_mcp_server/server.py --name TempoAI --with-editable . --env-file .env${NC}"
-    echo ""
-else
-    if ! command -v mcp >/dev/null 2>&1; then
-        echo -e "${RED}Error: 'mcp' command not found. Please ensure MCP is installed and available in your PATH.${NC}"
-        exit 1
-    fi
-    if ! mcp install src/tempoai_mcp_server/server.py --name "TempoAI" --with-editable . --env-file .env; then
-        echo -e "${RED}Error: Failed to configure Claude Desktop with MCP. Please check the output above for details.${NC}"
-        exit 1
-    fi
-    echo -e "${GREEN}✓ Claude Desktop configured${NC}"
+if ! command -v mcp >/dev/null 2>&1; then
+    echo -e "${RED}Error: 'mcp' command not found. Please ensure MCP is installed and available in your PATH.${NC}"
+    exit 1
 fi
+if ! mcp install src/tempoai_mcp_server/server.py --name "TempoAI" --with-editable . --env-file .env; then
+    echo -e "${RED}Error: Failed to configure Claude Desktop with MCP. Please check the output above for details.${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✓ Claude Desktop configured${NC}"
 
 # Success message
 echo ""
