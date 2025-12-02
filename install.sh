@@ -54,15 +54,8 @@ fi
 if ! command -v uv &> /dev/null; then
     echo -e "${YELLOW}📦 Installing uv package manager...${NC}"
     curl -LsSf https://astral.sh/uv/install.sh | sh
-    # Source the shell profile to get uv in PATH
-    # uv now installs to ~/.local/bin instead of ~/.cargo/bin
-    if [ -f "$HOME/.local/bin/env" ]; then
-        source "$HOME/.local/bin/env"
-    elif [ -f "$HOME/.cargo/env" ]; then
-        # Fallback for older uv installations
-        source "$HOME/.cargo/env"
-    fi
-    export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+    # Add uv to PATH for this session (installed to ~/.local/bin)
+    export PATH="$HOME/.local/bin:$PATH"
     echo -e "${GREEN}✓ uv installed successfully${NC}"
 else
     echo -e "${GREEN}✓ uv is already installed${NC}"
@@ -72,9 +65,20 @@ fi
 if [ -d "$INSTALL_DIR" ]; then
     echo -e "${YELLOW}📥 Updating existing installation...${NC}"
     cd "$INSTALL_DIR"
-    # Reset any local changes that might block the update
-    git reset --hard HEAD
-    git clean -fd
+
+    # Check for local modifications that would block the update
+    if ! git diff --quiet HEAD 2>/dev/null || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+        echo -e "${RED}Error: Local modifications detected in ${INSTALL_DIR}${NC}"
+        echo ""
+        echo "To preserve your changes, run:"
+        echo -e "  ${BLUE}cd ${INSTALL_DIR} && git stash && git pull && git stash pop${NC}"
+        echo ""
+        echo "To discard your changes and update, run:"
+        echo -e "  ${BLUE}cd ${INSTALL_DIR} && git reset --hard HEAD && git clean -fd && git pull${NC}"
+        echo ""
+        exit 1
+    fi
+
     git pull origin main
     echo -e "${GREEN}✓ Repository updated${NC}"
 else
