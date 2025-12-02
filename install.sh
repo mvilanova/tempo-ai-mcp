@@ -90,7 +90,7 @@ fi
 
 # Create virtual environment and sync dependencies
 echo -e "${YELLOW}🐍 Setting up Python 3.13 environment...${NC}"
-uv venv --python 3.13
+uv venv --python 3.13 --clear
 . .venv/bin/activate
 uv sync
 echo -e "${GREEN}✓ Python environment ready${NC}"
@@ -110,7 +110,7 @@ else
     echo "  2. Go to Settings > Developer"
     echo "  3. Generate a new API key"
     echo ""
-    read -s -p "Enter your Tempo AI API key: " API_KEY
+    read -s -p "Enter your Tempo AI API key: " API_KEY < /dev/tty
     echo
 
     if [ -z "$API_KEY" ]; then
