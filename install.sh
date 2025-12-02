@@ -96,7 +96,7 @@ uv sync
 echo -e "${GREEN}✓ Python environment ready${NC}"
 
 # Prompt for API key (skip if already configured)
-if [ -f ".env" ] && grep -q "API_KEY=.\+" .env; then
+if [ -f ".env" ] && grep -qE "API_KEY=.+" .env; then
     echo -e "${GREEN}✓ API key already configured${NC}"
     echo -e "  (To update your API key, edit ${INSTALL_DIR}/.env)"
 else
