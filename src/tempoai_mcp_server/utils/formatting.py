@@ -74,7 +74,7 @@ def format_workout_summary(workout: dict[str, Any]) -> str:
 
     lines = [
         f"Workout: {workout.get('name', 'Unnamed')}",
-        # f"  ID: {workout.get('id', 'N/A')}",
+        f"  ID: {workout.get('id', 'N/A')}",
         f"  Type: {workout.get('workout_type', 'Unknown')}",
         f"  Date: {start_time}",
         f"  Duration: {duration}",
