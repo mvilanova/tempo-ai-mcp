@@ -105,8 +105,8 @@ def format_workout_details(workout: dict[str, Any]) -> str:
 
     # Basic info
     lines.append("General Information:")
+    lines.append(f"  ID: {workout.get('id', 'N/A')}")
     lines.append(f"  Name: {workout.get('name', 'Unnamed')}")
-    # lines.append(f"  ID: {workout.get('id', 'N/A')}")
     lines.append(f"  Type: {workout.get('workout_type', 'Unknown')}")
     lines.append(f"  Status: {workout.get('status', 'N/A')}")
     lines.append(f"  Start Time: {_format_datetime(workout.get('start_time'))}")
