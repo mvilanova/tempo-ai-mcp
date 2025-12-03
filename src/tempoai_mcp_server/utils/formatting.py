@@ -7,6 +7,36 @@ This module contains formatting functions for handling data from the Tempo AI AP
 from datetime import datetime
 from typing import Any
 
+# Power duration curve benchmark durations (in order)
+POWER_DURATION_BENCHMARKS = [
+    "1s",
+    "3s",
+    "5s",
+    "10s",
+    "12s",
+    "15s",
+    "20s",
+    "30s",
+    "45s",
+    "1min",
+    "2min",
+    "3min",
+    "5min",
+    "8min",
+    "10min",
+    "12min",
+    "15min",
+    "20min",
+    "30min",
+    "40min",
+    "60min",
+    "90min",
+    "2h",
+    "3h",
+    "4h",
+    "5h",
+]
+
 
 def _format_datetime(dt_value: str | datetime | None) -> str:
     """Format a datetime value into a readable string."""
@@ -140,12 +170,21 @@ def format_workout_details(workout: dict[str, Any]) -> str:
     lines.append(f"  Average Power: {_get_value(workout, 'power_average')} W")
     lines.append(f"  Max Power: {_get_value(workout, 'power_max')} W")
     lines.append(f"  Norm Power: {_get_value(workout, 'power_normalized')} W")
-    lines.append(f"  5-min Max Power: {_get_value(workout, 'power_5min_max')} W")
     lines.append(f"  Estimated FTP: {_get_value(workout, 'estimated_ftp')} W")
     lines.append(f"  Intensity: {_get_value(workout, 'intensity_factor')}")
-    lines.append(f"  Variability Index: {_get_value(workout, 'variability_index')}")
+    lines.append(f"  Variability Index (VI): {_get_value(workout, 'variability_index')}")
     lines.append(f"  L/R Balance: {_get_value(workout, 'left_right_balance')}")
     lines.append("")
+
+    # Power duration curve
+    power_duration_curve = workout.get("power_duration_curve")
+    if power_duration_curve and isinstance(power_duration_curve, dict):
+        lines.append("Power Duration Curve:")
+        for duration in POWER_DURATION_BENCHMARKS:
+            if duration in power_duration_curve:
+                power = power_duration_curve[duration]
+                lines.append(f"  {duration}: {power} W")
+        lines.append("")
 
     # Heart rate metrics
     lines.append("Heart Rate:")
