@@ -143,6 +143,7 @@ def format_workout_details(workout: dict[str, Any]) -> str:
     lines.append(f"  5-min Max Power: {_get_value(workout, 'power_5min_max')} W")
     lines.append(f"  Estimated FTP: {_get_value(workout, 'estimated_ftp')} W")
     lines.append(f"  Intensity: {_get_value(workout, 'intensity_factor')}")
+    lines.append(f"  Variability Index: {_get_value(workout, 'variability_index')}")
     lines.append(f"  L/R Balance: {_get_value(workout, 'left_right_balance')}")
     lines.append("")
 
