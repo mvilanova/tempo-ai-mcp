@@ -5,8 +5,8 @@ This module provides a command-line interface for installing and managing
 the Tempo AI MCP Server. It uses Click for command handling.
 
 Usage:
-    tempoai-mcp-server install
-    tempoai-mcp-server install --api-key YOUR_API_KEY
+    tempo-ai-mcp install
+    tempo-ai-mcp install --api-key YOUR_API_KEY
 """
 
 import subprocess
@@ -73,7 +73,7 @@ def run_mcp_install(server_path: Path, package_dir: Path, env_file: Path) -> Non
 
 
 @click.group()
-@click.version_option(package_name="tempoai-mcp-server")
+@click.version_option(package_name="tempo-ai-mcp")
 def cli() -> None:
     """Tempo AI MCP Server - Connect Claude with your Tempo AI data."""
     ...

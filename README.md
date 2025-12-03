@@ -11,7 +11,7 @@ Get up and running with a single command:
 ### Option 1: One-line installer (recommended)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/mvilanova/tempoai-mcp-server/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/mvilanova/tempo-ai-mcp/main/install.sh | bash
 ```
 
 This will install everything automatically and configure Claude Desktop. You'll be prompted for your API key.
@@ -21,14 +21,14 @@ This will install everything automatically and configure Claude Desktop. You'll 
 If you have [uv](https://github.com/astral-sh/uv) installed:
 
 ```bash
-uvx tempoai-mcp-server install
+uvx tempo-ai-mcp install
 ```
 
 ### Option 3: Using pipx
 
 ```bash
-pipx install tempoai-mcp-server
-tempoai-mcp-server install
+pipx install tempo-ai-mcp
+tempo-ai-mcp install
 ```
 
 After installation, restart Claude Desktop and start chatting about your workouts!
@@ -57,8 +57,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ### 2. Clone this repository
 
 ```bash
-git clone https://github.com/mvilanova/tempoai-mcp-server.git
-cd tempoai-mcp-server
+git clone https://github.com/mvilanova/tempo-ai-mcp.git
+cd tempo-ai-mcp
 ```
 
 ### 3. Create and activate a virtual environment
@@ -156,10 +156,10 @@ mcp install src/tempoai_mcp_server/server.py --name "TempoAI" --with-editable . 
         "--with",
         "mcp[cli]",
         "--with-editable",
-        "/path/to/tempoai-mcp-server",
+        "/path/to/tempo-ai-mcp",
         "mcp",
         "run",
-        "/path/to/tempoai-mcp-server/src/tempoai_mcp_server/server.py"
+        "/path/to/tempo-ai-mcp/src/tempoai_mcp_server/server.py"
       ],
       "env": {
         "API_KEY": "<YOUR_API_KEY>"
@@ -169,7 +169,7 @@ mcp install src/tempoai_mcp_server/server.py --name "TempoAI" --with-editable . 
 }
 ```
 
-Where `/path/to/` is the path to the `tempoai-mcp-server` code folder in your system.
+Where `/path/to/` is the path to the `tempo-ai-mcp` code folder in your system.
 
 If you observe the following error messages when you open Claude Desktop, include the full path to `uv` in the command key in the `claude_desktop_config.json` configuration file. You can get the full path by running `which uv` in the terminal.
 

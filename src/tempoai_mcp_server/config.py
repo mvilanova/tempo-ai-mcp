@@ -38,7 +38,7 @@ def load_config() -> Config:
     """
     api_key = os.getenv("API_KEY", "")
     tempo_ai_api_base_url = os.getenv("TEMPO_AI_API_BASE_URL", "https://api.jointempo.ai/api/v1")
-    user_agent = "tempoai-mcp-server/1.0"
+    user_agent = "tempo-ai-mcp/1.0"
 
     return Config(
         api_key=api_key,

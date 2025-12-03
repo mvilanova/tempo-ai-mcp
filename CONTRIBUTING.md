@@ -57,7 +57,7 @@ uv run --locked pytest
 ## Pull request guidelines
 
 * Use concise commit messages.
-* Title your pull request using the format `[tempoai-mcp-server] <brief description>`.
+* Title your pull request using the format `[tempo-ai-mcp] <brief description>`.
 * Describe any manual testing you performed and confirm whether `ruff`, `mypy`, and `pytest` passed.
 
 We appreciate your contributions and your attention to these guidelines. Happy coding!

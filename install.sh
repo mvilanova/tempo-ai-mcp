@@ -3,11 +3,11 @@
 # Tempo AI MCP Server Installer
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/mvilanova/tempoai-mcp-server/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/mvilanova/tempo-ai-mcp/main/install.sh | bash
 #
 # This script will:
 #   1. Install uv package manager if not present
-#   2. Clone the repository to ~/.tempoai-mcp-server
+#   2. Clone the repository to ~/.tempo-ai-mcp
 #   3. Set up Python 3.13 virtual environment
 #   4. Install dependencies
 #   5. Prompt for API key
@@ -22,8 +22,8 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-INSTALL_DIR="${HOME}/.tempoai-mcp-server"
-REPO_URL="https://github.com/mvilanova/tempoai-mcp-server.git"
+INSTALL_DIR="${HOME}/.tempo-ai-mcp"
+REPO_URL="https://github.com/mvilanova/tempo-ai-mcp.git"
 
 echo -e "${GREEN}"
 echo "╔══════════════════════════════════════════════════════════════╗"

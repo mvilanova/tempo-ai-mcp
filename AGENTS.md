@@ -17,7 +17,7 @@ This project is a Python 3.13 backend service built with FastMCP and httpx. All 
 
 ## PR Instructions
 - Use concise commit messages.
-- Title pull requests using the format `[tempoai-mcp-server] <brief description>`.
+- Title pull requests using the format `[tempo-ai-mcp] <brief description>`.
 - Describe any manual testing steps performed and mention whether `pytest`, `ruff`, and `mypy` passed.
 
 There is currently no frontend code in this repository. If a frontend is added in the future (for example with React or another framework), document how to run and test it within this file.
