@@ -7,6 +7,36 @@ This module contains formatting functions for handling data from the Tempo AI AP
 from datetime import datetime
 from typing import Any
 
+# Power duration curve benchmark durations (in order)
+POWER_DURATION_BENCHMARKS = [
+    "1s",
+    "3s",
+    "5s",
+    "10s",
+    "12s",
+    "15s",
+    "20s",
+    "30s",
+    "45s",
+    "1min",
+    "2min",
+    "3min",
+    "5min",
+    "8min",
+    "10min",
+    "12min",
+    "15min",
+    "20min",
+    "30min",
+    "40min",
+    "60min",
+    "90min",
+    "2h",
+    "3h",
+    "4h",
+    "5h",
+]
+
 
 def _format_datetime(dt_value: str | datetime | None) -> str:
     """Format a datetime value into a readable string."""
@@ -150,36 +180,7 @@ def format_workout_details(workout: dict[str, Any]) -> str:
     power_duration_curve = workout.get("power_duration_curve")
     if power_duration_curve and isinstance(power_duration_curve, dict):
         lines.append("Power Duration Curve:")
-        # Define benchmark durations in order
-        benchmark_order = [
-            "1s",
-            "3s",
-            "5s",
-            "10s",
-            "12s",
-            "15s",
-            "20s",
-            "30s",
-            "45s",
-            "1min",
-            "2min",
-            "3min",
-            "5min",
-            "8min",
-            "10min",
-            "12min",
-            "15min",
-            "20min",
-            "30min",
-            "40min",
-            "60min",
-            "90min",
-            "2h",
-            "3h",
-            "4h",
-            "5h",
-        ]
-        for duration in benchmark_order:
+        for duration in POWER_DURATION_BENCHMARKS:
             if duration in power_duration_curve:
                 power = power_duration_curve[duration]
                 lines.append(f"  {duration}: {power} W")
