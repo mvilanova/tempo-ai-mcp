@@ -1,0 +1,27 @@
+# Typos configuration file
+# This file configures the typos spell checker to allow specific words
+# Heat Strain Index - correct acronym is HSI (not HIS)
+
+[default]
+# Regex patterns for lines to ignore entirely
+extend-ignore-re = [
+    # Wahoo ELEMNT is a brand name (intentionally spelled without the 'E')
+    "ELEMNT",
+]
+
+[default.extend-words]
+# Mark HSI as a valid word (not a typo of HIS)
+HSI = "HSI"
+hsi = "hsi"
+
+[default.extend-identifiers]
+# Mark camelCase identifiers containing HSI as valid
+minHSI = "minHSI"
+avgHSI = "avgHSI"
+maxHSI = "maxHSI"
+hasValidHSI = "hasValidHSI"
+renderHSIStat = "renderHSIStat"
+validHSIValues = "validHSIValues"
+hsiStats = "hsiStats"
+hsiLow = "hsiLow"
+hsiHigh = "hsiHigh"

@@ -7,6 +7,61 @@ This module contains formatting functions for handling data from the Tempo AI AP
 from datetime import datetime
 from typing import Any
 
+# Zone name mappings (consistent with iOS and web frontends)
+HR_ZONE_NAMES: dict[str, str] = {
+    "Z1": "Z1 Recovery",
+    "Z2": "Z2 Endurance",
+    "Z3": "Z3 Tempo",
+    "Z4": "Z4 Threshold",
+    "Z5": "Z5 VO2 Max",
+}
+
+POWER_ZONE_NAMES: dict[str, str] = {
+    "Z1": "Z1 Recovery",
+    "Z2": "Z2 Endurance",
+    "Z3": "Z3 Tempo",
+    "SS": "SS Sweet Spot",
+    "Z4": "Z4 Threshold",
+    "Z5": "Z5 VO2 Max",
+    "Z6": "Z6 Anaerobic",
+    "Z7": "Z7 Neuromuscular",
+}
+
+TEMPERATURE_ZONE_NAMES: dict[str, str] = {
+    "z1_freezing": "Freezing",
+    "z2_cold": "Cold",
+    "z3_cool": "Cool",
+    "z4_mild": "Mild",
+    "z5_warm": "Warm",
+    "z6_hot": "Hot",
+    "z7_extreme": "Extreme",
+}
+
+CORE_TEMPERATURE_ZONE_NAMES: dict[str, str] = {
+    "z1_low": "Low",
+    "z2_normal": "Normal",
+    "z3_moderate": "Moderate",
+    "z4_elevated": "Elevated",
+    "z5_high": "High",
+    "z6_very_high": "Very High",
+}
+
+SKIN_TEMPERATURE_ZONE_NAMES: dict[str, str] = {
+    "z1_cool": "Cool",
+    "z2_mild": "Mild",
+    "z3_normal": "Normal",
+    "z4_warm": "Warm",
+    "z5_hot": "Hot",
+    "z6_very_hot": "Very Hot",
+}
+
+HEAT_STRAIN_ZONE_NAMES: dict[str, str] = {
+    "z1_no_strain": "No Strain",
+    "z2_moderate": "Moderate",
+    "z3_high": "High",
+    "z4_extremely_high": "Extremely High",
+}
+
 # Power duration curve benchmark durations (in order)
 POWER_DURATION_BENCHMARKS = [
     "1s",
@@ -84,6 +139,38 @@ def _get_value(data: dict[str, Any], key: str, default: str = "N/A") -> str:
     return str(value)
 
 
+def _format_time_in_zone(
+    zone_data: dict[str, Any] | None,
+    label: str,
+    zone_names: dict[str, str] | None = None,
+) -> list[str]:
+    """Format a time-in-zone dict into labeled duration lines.
+
+    Args:
+        zone_data: Dict mapping zone keys to seconds, e.g. {"Z1": 120.5, "Z2": 300.0}.
+        label: Section heading to display, e.g. "Heart Rate Zones".
+        zone_names: Optional mapping of zone keys to human-readable names.
+            Falls back to the raw key if no mapping is found.
+
+    Returns:
+        A list of formatted lines, empty if zone_data is missing or empty.
+    """
+    if not zone_data or not isinstance(zone_data, dict):
+        return []
+    lines = [f"{label}:"]
+    for zone_key, seconds in zone_data.items():
+        display_name = zone_names.get(zone_key, zone_key) if zone_names else zone_key
+        lines.append(f"  {display_name}: {_format_duration(seconds)}")
+    return lines
+
+
+def _format_percentage(value: float | None) -> str:
+    """Format a percentage value, returning 'N/A' if None."""
+    if value is None:
+        return "N/A"
+    return f"{value:.1f}%"
+
+
 # ============================================================================
 # Workout Formatters
 # ============================================================================
@@ -118,6 +205,112 @@ def format_workout_summary(workout: dict[str, Any]) -> str:
         lines.append(f"  Load: {workout['training_stress_score']}")
     if workout.get("intensity_factor"):
         lines.append(f"  Intensity: {workout['intensity_factor']:.2f}")
+
+    laps = workout.get("laps", [])
+    if laps and isinstance(laps, list):
+        lines.append(f"  Laps: {len(laps)}")
+
+    return "\n".join(lines)
+
+
+def format_workout_lap(lap: dict[str, Any]) -> str:
+    """Format a single workout lap into a readable block.
+
+    Only includes metrics that are present (non-None). Designed for lap/interval
+    data returned by WorkoutLapRead from the Tempo AI API.
+
+    Args:
+        lap: Dictionary containing lap data.
+
+    Returns:
+        A formatted string for the lap.
+    """
+    lap_index = lap.get("lap_index", "?")
+    lap_name = lap.get("name")
+    header = f"  Lap {lap_index}"
+    if lap_name:
+        header += f" - {lap_name}"
+    lines = [header]
+
+    # Timing
+    elapsed = lap.get("elapsed_time")
+    if elapsed is not None:
+        lines.append(f"    Elapsed: {_format_duration(elapsed)}")
+    moving = lap.get("moving_time")
+    if moving is not None:
+        lines.append(f"    Moving: {_format_duration(moving)}")
+
+    # Distance & Elevation
+    distance = lap.get("distance")
+    if distance is not None:
+        lines.append(f"    Distance: {_format_distance(distance)}")
+    elev_gain = lap.get("total_elevation_gain")
+    if elev_gain is not None:
+        lines.append(f"    Elevation Gain: {elev_gain:.0f} m")
+
+    # Speed
+    avg_speed = lap.get("avg_speed")
+    if avg_speed is not None:
+        lines.append(f"    Avg Speed: {avg_speed:.1f} m/s")
+    max_speed = lap.get("max_speed")
+    if max_speed is not None:
+        lines.append(f"    Max Speed: {max_speed:.1f} m/s")
+
+    # Power
+    power_parts: list[str] = []
+    if lap.get("avg_power") is not None:
+        power_parts.append(f"Avg {lap['avg_power']}W")
+    if lap.get("normalized_power") is not None:
+        power_parts.append(f"NP {lap['normalized_power']}W")
+    if lap.get("max_power") is not None:
+        power_parts.append(f"Max {lap['max_power']}W")
+    if power_parts:
+        lines.append(f"    Power: {' / '.join(power_parts)}")
+    if lap.get("watts_per_kg") is not None:
+        lines.append(f"    W/kg: {lap['watts_per_kg']:.2f}")
+
+    # Cadence
+    if lap.get("avg_cadence") is not None:
+        lines.append(f"    Cadence: {lap['avg_cadence']} rpm")
+
+    # Heart rate
+    hr_parts: list[str] = []
+    if lap.get("avg_heart_rate") is not None:
+        hr_parts.append(f"Avg {lap['avg_heart_rate']}")
+    if lap.get("max_heart_rate") is not None:
+        hr_parts.append(f"Max {lap['max_heart_rate']}")
+    if hr_parts:
+        lines.append(f"    HR: {' / '.join(hr_parts)} bpm")
+
+    # Training load
+    load_parts: list[str] = []
+    if lap.get("intensity_factor") is not None:
+        load_parts.append(f"IF {lap['intensity_factor']:.2f}")
+    if lap.get("variability_index") is not None:
+        load_parts.append(f"VI {lap['variability_index']:.2f}")
+    if lap.get("training_stress_score") is not None:
+        load_parts.append(f"TSS {lap['training_stress_score']:.0f}")
+    if load_parts:
+        lines.append(f"    Load: {' / '.join(load_parts)}")
+
+    # Efficiency
+    eff_parts: list[str] = []
+    if lap.get("efficiency_factor") is not None:
+        eff_parts.append(f"EF {lap['efficiency_factor']:.2f}")
+    if lap.get("power_hr_ratio") is not None:
+        eff_parts.append(f"P:HR {lap['power_hr_ratio']:.2f}")
+    if eff_parts:
+        lines.append(f"    Efficiency: {' / '.join(eff_parts)}")
+
+    # Climbing
+    if lap.get("vam") is not None:
+        lines.append(f"    VAM: {lap['vam']:.0f} m/h")
+
+    # Work
+    if lap.get("work_joules") is not None:
+        lines.append(f"    Work: {lap['work_joules'] / 1000:.1f} kJ")
+    if lap.get("calories") is not None:
+        lines.append(f"    Calories: {lap['calories']}")
 
     return "\n".join(lines)
 
@@ -190,7 +383,7 @@ def format_workout_details(workout: dict[str, Any]) -> str:
     lines.append("Heart Rate:")
     lines.append(f"  Average HR: {_get_value(workout, 'heart_rate_average')} bpm")
     lines.append(f"  Max HR: {_get_value(workout, 'heart_rate_max')} bpm")
-    lines.append(f"  HR Recovery: {_get_value(workout, 'best_vagal_rebound')}")
+    lines.append(f"  HR Recovery: {_get_value(workout, 'best_vagal_rebound')} bpm")
     lines.append("")
 
     # Training metrics
@@ -201,6 +394,15 @@ def format_workout_details(workout: dict[str, Any]) -> str:
     lines.append(f"  Power:HR Ratio: {_get_value(workout, 'power_hr_ratio')}")
     lines.append(f"  Cadence: {_get_value(workout, 'cadence_average')} rpm")
     lines.append("")
+
+    # Decoupling metrics
+    if workout.get("cardiac_drift") is not None or workout.get("power_fade") is not None:
+        lines.append("Decoupling:")
+        if workout.get("cardiac_drift") is not None:
+            lines.append(f"  Cardiac Drift: {_format_percentage(workout['cardiac_drift'])}")
+        if workout.get("power_fade") is not None:
+            lines.append(f"  Power Fade: {_format_percentage(workout['power_fade'])}")
+        lines.append("")
 
     # Energy metrics
     lines.append("Energy:")
@@ -219,30 +421,100 @@ def format_workout_details(workout: dict[str, Any]) -> str:
             lines.append(f"  RPE: {workout['perceived_exertion']}/10")
         lines.append("")
 
-    # Notes
-    # if workout.get("notes"):
-    #     lines.append(f"Notes: {workout['notes']}")
-    #     lines.append("")
+    # Time in zone metrics
+    hr_zone_lines = _format_time_in_zone(
+        workout.get("time_in_hr_zone"), "Heart Rate Zones", HR_ZONE_NAMES
+    )
+    if hr_zone_lines:
+        lines.extend(hr_zone_lines)
+        lines.append("")
 
-    # AI Coach Insights
-    # if workout.get("ai_coach_insights"):
-    #     insights = workout["ai_coach_insights"]
-    #     lines.append("AI Coach Insights:")
-    #     if insights.get("intro"):
-    #         lines.append(f"  {insights['intro']}")
-    #     if insights.get("insights"):
-    #         lines.append(f"  {insights['insights']}")
-    #     if insights.get("closing"):
-    #         lines.append(f"  {insights['closing']}")
-    #     lines.append("")
+    power_zone_lines = _format_time_in_zone(
+        workout.get("time_in_power_zone"), "Power Zones", POWER_ZONE_NAMES
+    )
+    if power_zone_lines:
+        lines.extend(power_zone_lines)
+        lines.append("")
+
+    temp_zone_lines = _format_time_in_zone(
+        workout.get("time_in_temperature_zone"), "Temperature Zones", TEMPERATURE_ZONE_NAMES
+    )
+    if temp_zone_lines:
+        lines.extend(temp_zone_lines)
+        lines.append("")
+
+    # CORE sensor zones
+    core_temp_zone_lines = _format_time_in_zone(
+        workout.get("time_in_core_temperature_zone"),
+        "Core Temperature Zones",
+        CORE_TEMPERATURE_ZONE_NAMES,
+    )
+    if core_temp_zone_lines:
+        lines.extend(core_temp_zone_lines)
+        lines.append("")
+
+    skin_temp_zone_lines = _format_time_in_zone(
+        workout.get("time_in_skin_temperature_zone"),
+        "Skin Temperature Zones",
+        SKIN_TEMPERATURE_ZONE_NAMES,
+    )
+    if skin_temp_zone_lines:
+        lines.extend(skin_temp_zone_lines)
+        lines.append("")
+
+    heat_strain_zone_lines = _format_time_in_zone(
+        workout.get("time_in_heat_strain_zone"), "Heat Strain Zones", HEAT_STRAIN_ZONE_NAMES
+    )
+    if heat_strain_zone_lines:
+        lines.extend(heat_strain_zone_lines)
+        lines.append("")
+
+    # CORE sensor summary statistics
+    core_fields = [
+        ("min_core_temperature", "avg_core_temperature", "max_core_temperature", "Core Temp"),
+        ("min_skin_temperature", "avg_skin_temperature", "max_skin_temperature", "Skin Temp"),
+        ("min_heat_strain_index", "avg_heat_strain_index", "max_heat_strain_index", "Heat Strain"),
+    ]
+    core_stats: list[str] = []
+    for min_key, avg_key, max_key, label in core_fields:
+        min_val = workout.get(min_key)
+        avg_val = workout.get(avg_key)
+        max_val = workout.get(max_key)
+        if any(v is not None for v in (min_val, avg_val, max_val)):
+            min_s = f"{min_val:.1f}" if min_val is not None else "N/A"
+            avg_s = f"{avg_val:.1f}" if avg_val is not None else "N/A"
+            max_s = f"{max_val:.1f}" if max_val is not None else "N/A"
+            unit = " Heat Strain Index" if "strain" in min_key else " °C"
+            core_stats.append(f"  {label}: {min_s} / {avg_s} / {max_s}{unit} (min/avg/max)")
+
+    if core_stats:
+        lines.append("CORE Sensor:")
+        lines.extend(core_stats)
+        lines.append("")
+
+    # Notes
+    if workout.get("notes"):
+        lines.append(f"Notes: {workout['notes']}")
+        lines.append("")
 
     # Source info
     lines.append("Source:")
     lines.append(f"  Source: {_get_value(workout, 'source')}")
-    # if workout.get("external_strava_activity_id"):
-    #     lines.append(f"  Strava ID: {workout['external_strava_activity_id']}")
+    if workout.get("device_name"):
+        lines.append(f"  Device: {workout['device_name']}")
+    if workout.get("time_zone"):
+        lines.append(f"  Time Zone: {workout['time_zone']}")
     lines.append(f"  Created: {_format_datetime(workout.get('created_at'))}")
     lines.append(f"  Updated: {_format_datetime(workout.get('updated_at'))}")
+
+    # Laps
+    laps = workout.get("laps", [])
+    if laps and isinstance(laps, list):
+        lines.append("")
+        lines.append(f"Laps ({len(laps)}):")
+        for lap in laps:
+            if isinstance(lap, dict):
+                lines.append(format_workout_lap(lap))
 
     return "\n".join(lines)
 
