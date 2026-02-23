@@ -12,6 +12,7 @@ from tests.sample_data import (
 )
 
 from tempoai_mcp_server.utils.formatting import (
+    _calculate_hrv_score,
     format_event_details,
     format_event_summary,
     format_wellness_entry,
@@ -294,6 +295,78 @@ def test_format_wellness_entry():
     assert "2024-01-01" in result
     assert "70.5 kg" in result
     assert "55 bpm" in result
+
+
+def test_format_wellness_entry_hrv_score():
+    """Test that raw RMSSD is converted to HRV Score (ln(RMSSD) x 20)."""
+    entry = {
+        "id": 1,
+        "date": "2024-01-01",
+        "hrv_rmssd": 45,
+    }
+    result = format_wellness_entry(entry)
+    assert "HRV Score: 76" in result
+    assert "HRV (RMSSD)" not in result
+
+
+def test_format_wellness_entry_hrv_baseline_score():
+    """Test that HRV baseline RMSSD is converted to HRV Score."""
+    entry = {
+        "id": 1,
+        "date": "2024-01-01",
+        "hrv_rmssd": 45,
+        "hrv_rmssd_baseline": 50.0,
+    }
+    result = format_wellness_entry(entry)
+    assert "HRV Score: 76" in result
+    assert "HRV Score Baseline: 78" in result
+    assert "HRV Baseline:" not in result
+
+
+def test_format_wellness_entry_no_hrv():
+    """Test that HRV section is omitted when no HRV data."""
+    entry = {
+        "id": 1,
+        "date": "2024-01-01",
+        "hrv_rmssd": None,
+    }
+    result = format_wellness_entry(entry)
+    assert "HRV" not in result
+
+
+# ============================================================================
+# HRV Score Calculation Tests
+# ============================================================================
+
+
+def test_calculate_hrv_score_typical():
+    """Test HRV score for a typical RMSSD value (45 ms)."""
+    assert _calculate_hrv_score(45) == 76
+
+
+def test_calculate_hrv_score_high():
+    """Test HRV score for a high RMSSD value (100 ms)."""
+    assert _calculate_hrv_score(100) == 92
+
+
+def test_calculate_hrv_score_low():
+    """Test HRV score for a low RMSSD value (15 ms)."""
+    assert _calculate_hrv_score(15) == 54
+
+
+def test_calculate_hrv_score_none():
+    """Test that None input returns None."""
+    assert _calculate_hrv_score(None) is None
+
+
+def test_calculate_hrv_score_zero():
+    """Test that zero returns None (log(0) is undefined)."""
+    assert _calculate_hrv_score(0) is None
+
+
+def test_calculate_hrv_score_negative():
+    """Test that negative values return None."""
+    assert _calculate_hrv_score(-5) is None
 
 
 # ============================================================================

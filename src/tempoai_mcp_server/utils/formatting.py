@@ -4,6 +4,7 @@ Formatting utilities for Tempo AI MCP Server
 This module contains formatting functions for handling data from the Tempo AI API.
 """
 
+import math
 from datetime import datetime
 from typing import Any
 
@@ -169,6 +170,25 @@ def _format_percentage(value: float | None) -> str:
     if value is None:
         return "N/A"
     return f"{value:.1f}%"
+
+
+def _calculate_hrv_score(rmssd: float | int | None) -> int | None:
+    """Convert raw RMSSD (ms) to HRV Score using ln(RMSSD) x 20.
+
+    This transformation is used consistently across all Tempo clients (web, iOS,
+    MCP) and matches the formula used by ithlete, Morpheus, and Elite HRV.
+    It normalizes the exponentially-distributed raw values into a user-friendly
+    range (typically 50-100 for healthy adults).
+
+    Args:
+        rmssd: Raw RMSSD value in milliseconds.
+
+    Returns:
+        HRV Score as a rounded integer, or None if input is invalid.
+    """
+    if rmssd is None or rmssd <= 0:
+        return None
+    return round(math.log(rmssd) * 20)
 
 
 # ============================================================================
@@ -561,8 +581,9 @@ def format_wellness_entry(entry: dict[str, Any]) -> str:
         recovery_metrics.append(f"  Sleep: {entry['sleep_hours']:.1f} hours")
     if entry.get("resting_hr") is not None:
         recovery_metrics.append(f"  Resting HR: {entry['resting_hr']} bpm")
-    if entry.get("hrv_rmssd") is not None:
-        recovery_metrics.append(f"  HRV (RMSSD): {entry['hrv_rmssd']}")
+    hrv_score = _calculate_hrv_score(entry.get("hrv_rmssd"))
+    if hrv_score is not None:
+        recovery_metrics.append(f"  HRV Score: {hrv_score}")
     if entry.get("readiness_score") is not None:
         recovery_metrics.append(f"  Readiness Score: {entry['readiness_score']}")
     if entry.get("vo2max") is not None:
@@ -575,8 +596,9 @@ def format_wellness_entry(entry: dict[str, Any]) -> str:
 
     # Baselines (7-day rolling averages)
     baselines = []
-    if entry.get("hrv_rmssd_baseline") is not None:
-        baselines.append(f"  HRV Baseline: {entry['hrv_rmssd_baseline']:.1f}")
+    hrv_baseline_score = _calculate_hrv_score(entry.get("hrv_rmssd_baseline"))
+    if hrv_baseline_score is not None:
+        baselines.append(f"  HRV Score Baseline: {hrv_baseline_score}")
     if entry.get("resting_hr_baseline") is not None:
         baselines.append(f"  Resting HR Baseline: {entry['resting_hr_baseline']:.1f} bpm")
     if entry.get("sleep_baseline") is not None:
