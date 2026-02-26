@@ -132,6 +132,18 @@ If Claude Desktop fails due to configuration changes, follow these steps:
 mcp install src/tempoai_mcp_server/server.py --name "TempoAI" --with-editable . --env-file .env
 ```
 
+## Uninstalling
+
+1. Remove the installation directory:
+
+```bash
+rm -rf ~/.tempo-ai-mcp
+```
+
+2. Remove the `TempoAI` entry from your Claude Desktop configuration file (`claude_desktop_config.json`).
+
+3. Restart Claude Desktop.
+
 ## Usage with Claude
 
 ### 1. Configure Claude Desktop
